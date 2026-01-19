@@ -1,0 +1,25 @@
+load("@bazel_lib//lib/private:zstd_toolchain.bzl", "zstd_toolchain")
+
+package(default_visibility = ["//visibility:public"]) 
+
+# Export a tiny wrapper script that forwards to the system-provided zstd binary.
+exports_files([
+    "zstd",
+])
+
+zstd_toolchain(
+    name = "zstd_toolchain",
+    binary = ":zstd",
+)
+
+# Toolchain registration target for ppc64le Linux hosts. If your host uses a
+# different platform label adjust the `exec_compatible_with` entries.
+toolchain(
+    name = "ppc64le_toolchain",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:ppc64le",
+    ],
+    toolchain = ":zstd_toolchain",
+    toolchain_type = "@bazel_lib//lib:zstd_toolchain_type",
+)
