@@ -8,7 +8,7 @@ sh_binary(
     name = "coreutils_wrapper",
     # Use a generated, executable copy of the workspace script so we do not
     # depend on the source file's executable bit in the repo.
-    srcs = [":coreutils_exec_bin"],
+    srcs = [":coreutils_exec_bin_sh"],
 )
 
 coreutils_toolchain(
@@ -17,9 +17,9 @@ coreutils_toolchain(
 )
 
 genrule(
-    name = "coreutils_exec_bin",
+    name = "coreutils_exec_bin_sh",
     srcs = ["coreutils"],
-    outs = ["coreutils_exec_bin"],
+    outs = ["coreutils_exec_bin.sh"],
     cmd = "cp $(location coreutils) $@ && chmod +x $@",
 )
 
