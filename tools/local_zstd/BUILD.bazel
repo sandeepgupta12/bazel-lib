@@ -6,7 +6,9 @@ package(default_visibility = ["//visibility:public"])
 
 sh_binary(
     name = "zstd_wrapper",
-    srcs = ["zstd"],
+    # Use a generated, executable copy of the workspace script so we do not
+    # depend on the source file's executable bit in the repo.
+    srcs = [":zstd_exec"],
 )
 
 zstd_toolchain(
@@ -24,4 +26,11 @@ toolchain(
     ],
     toolchain = ":zstd_toolchain",
     toolchain_type = "@bazel_lib//lib:zstd_toolchain_type",
+)
+
+genrule(
+    name = "zstd_exec",
+    srcs = ["zstd"],
+    outs = ["zstd_exec"],
+    cmd = "cp $(location zstd) $@ && chmod +x $@",
 )

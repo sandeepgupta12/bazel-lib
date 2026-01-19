@@ -6,12 +6,21 @@ package(default_visibility = ["//visibility:public"])
 
 sh_binary(
     name = "coreutils_wrapper",
-    srcs = ["coreutils"],
+    # Use a generated, executable copy of the workspace script so we do not
+    # depend on the source file's executable bit in the repo.
+    srcs = [":coreutils_exec"],
 )
 
 coreutils_toolchain(
     name = "coreutils_toolchain",
     binary = ":coreutils_wrapper",
+)
+
+genrule(
+    name = "coreutils_exec",
+    srcs = ["coreutils"],
+    outs = ["coreutils_exec"],
+    cmd = "cp $(location coreutils) $@ && chmod +x $@",
 )
 
 # Toolchain registration target for ppc64le Linux hosts. If your host uses a
