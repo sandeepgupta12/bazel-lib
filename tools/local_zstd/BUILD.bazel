@@ -8,7 +8,7 @@ sh_binary(
     name = "zstd_wrapper",
     # Use a generated, executable copy of the workspace script so we do not
     # depend on the source file's executable bit in the repo.
-    srcs = [":zstd_exec"],
+    srcs = [":zstd_exec_bin"],
 )
 
 zstd_toolchain(
@@ -29,8 +29,8 @@ toolchain(
 )
 
 genrule(
-    name = "zstd_exec",
+    name = "zstd_exec_bin",
     srcs = ["zstd"],
-    outs = ["zstd_exec"],
+    outs = ["zstd_exec_bin"],
     cmd = "cp $(location zstd) $@ && chmod +x $@",
 )
