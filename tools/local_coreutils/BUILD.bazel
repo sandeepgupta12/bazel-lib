@@ -1,17 +1,17 @@
 load("@bazel_lib//lib/private:coreutils_toolchain.bzl", "coreutils_toolchain")
 
+# Make an executable sh wrapper target so Bazel will run an executable from
+# the action sandbox reliably (avoids workspace-file exec bit problems).
 package(default_visibility = ["//visibility:public"]) 
 
-# Export a tiny wrapper script that forwards subcommands to the system-provided
-# coreutils utilities (ls, sha256sum, sha512sum, wc, etc.). This lets Bazel
-# use the system-provided binaries without downloading prebuilt archives.
-exports_files([
-    "coreutils",
-])
+sh_binary(
+    name = "coreutils_wrapper",
+    srcs = ["coreutils"],
+)
 
 coreutils_toolchain(
     name = "coreutils_toolchain",
-    binary = ":coreutils",
+    binary = ":coreutils_wrapper",
 )
 
 # Toolchain registration target for ppc64le Linux hosts. If your host uses a

@@ -1,15 +1,17 @@
 load("@bazel_lib//lib/private:zstd_toolchain.bzl", "zstd_toolchain")
 
+# Make an executable sh wrapper target so Bazel will run an executable from
+# the action sandbox reliably (avoids workspace-file exec bit problems).
 package(default_visibility = ["//visibility:public"]) 
 
-# Export a tiny wrapper script that forwards to the system-provided zstd binary.
-exports_files([
-    "zstd",
-])
+sh_binary(
+    name = "zstd_wrapper",
+    srcs = ["zstd"],
+)
 
 zstd_toolchain(
     name = "zstd_toolchain",
-    binary = ":zstd",
+    binary = ":zstd_wrapper",
 )
 
 # Toolchain registration target for ppc64le Linux hosts. If your host uses a
