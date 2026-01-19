@@ -26,6 +26,9 @@ register_toolchains(
     "@expand_template_toolchains//:all",
     "@bats_toolchains//:all",
     "@zstd_toolchains//:all",
+    # Register local system-provided coreutils toolchain (for e.g. ppc64le hosts).
+    # This points to the toolchain defined in //tools/local_coreutils:ppc64le_toolchain
+    "//tools/local_coreutils:ppc64le_toolchain",
 )
 
 ####### Dev dependencies ########

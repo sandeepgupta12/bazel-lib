@@ -1,0 +1,27 @@
+load("@bazel_lib//lib/private:coreutils_toolchain.bzl", "coreutils_toolchain")
+
+package(default_visibility = ["//visibility:public"]) 
+
+# Export a tiny wrapper script that forwards subcommands to the system-provided
+# coreutils utilities (ls, sha256sum, sha512sum, wc, etc.). This lets Bazel
+# use the system-provided binaries without downloading prebuilt archives.
+exports_files([
+    "coreutils",
+])
+
+coreutils_toolchain(
+    name = "coreutils_toolchain",
+    binary = ":coreutils",
+)
+
+# Toolchain registration target for ppc64le Linux hosts. If your host uses a
+# different platform label adjust the `exec_compatible_with` entries.
+toolchain(
+    name = "ppc64le_toolchain",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:ppc64le",
+    ],
+    toolchain = ":coreutils_toolchain",
+    toolchain_type = "@bazel_lib//lib:coreutils_toolchain_type",
+)
