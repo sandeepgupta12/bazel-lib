@@ -155,7 +155,8 @@ CoreUtilsInfo = provider(
 )
 
 def _coreutils_toolchain_impl(ctx):
-    binary = ctx.file.binary
+    # Accept an executable label (cfg="exec") so sh_binary wrappers work.
+    binary = ctx.executable.binary
 
     # Make the $(COREUTILS_BIN) variable available in places like genrules.
     # See https://docs.bazel.build/versions/main/be/make-variables.html#custom_variables
@@ -184,8 +185,11 @@ coreutils_toolchain = rule(
     implementation = _coreutils_toolchain_impl,
     attrs = {
         "binary": attr.label(
+            doc = "an executable to run for coreutils (sh_binary or file)",
             mandatory = True,
-            allow_single_file = True,
+            allow_files = True,
+            executable = True,
+            cfg = "exec",
         ),
     },
 )

@@ -1,0 +1,36 @@
+load("@bazel_lib//lib/private:coreutils_toolchain.bzl", "coreutils_toolchain")
+
+# Make an executable sh wrapper target so Bazel will run an executable from
+# the action sandbox reliably (avoids workspace-file exec bit problems).
+package(default_visibility = ["//visibility:public"]) 
+
+sh_binary(
+    name = "coreutils_wrapper",
+    # Use a generated, executable copy of the workspace script so we do not
+    # depend on the source file's executable bit in the repo.
+    srcs = [":coreutils_exec_bin_sh"],
+)
+
+coreutils_toolchain(
+    name = "coreutils_toolchain",
+    binary = ":coreutils_wrapper",
+)
+
+genrule(
+    name = "coreutils_exec_bin_sh",
+    srcs = ["coreutils"],
+    outs = ["coreutils_exec_bin.sh"],
+    cmd = "cp $(location coreutils) $@ && chmod +x $@",
+)
+
+# Toolchain registration target for ppc64le Linux hosts. If your host uses a
+# different platform label adjust the `exec_compatible_with` entries.
+toolchain(
+    name = "ppc64le_toolchain",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:ppc64le",
+    ],
+    toolchain = ":coreutils_toolchain",
+    toolchain_type = "@bazel_lib//lib:coreutils_toolchain_type",
+)

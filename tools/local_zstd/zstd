@@ -1,0 +1,8 @@
+#!/bin/sh
+# Wrapper that forwards to the system-provided zstd executable (e.g. installed via yum)
+if [ -x "/usr/bin/zstd" ]; then
+  exec "/usr/bin/zstd" "$@"
+fi
+
+# Fallback to PATH
+exec zstd "$@"

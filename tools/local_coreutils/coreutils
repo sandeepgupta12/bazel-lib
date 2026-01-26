@@ -1,0 +1,21 @@
+#!/bin/sh
+# Simple wrapper that forwards a subcommand to the system-provided utility.
+# Usage: $(COREUTILS_BIN) <subcommand> [args...]
+
+if [ -z "$1" ]; then
+  echo "usage: $0 <subcommand> [args...]" >&2
+  exit 2
+fi
+
+cmd="$1"
+shift
+
+# Prefer /usr/bin and /bin; fall back to PATH if not found.
+for d in /usr/bin /bin; do
+  if [ -x "$d/$cmd" ]; then
+    exec "$d/$cmd" "$@"
+  fi
+done
+
+# last resort: try to exec the command from PATH
+exec "$cmd" "$@"

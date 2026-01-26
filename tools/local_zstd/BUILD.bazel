@@ -1,0 +1,36 @@
+load("@bazel_lib//lib/private:zstd_toolchain.bzl", "zstd_toolchain")
+
+# Make an executable sh wrapper target so Bazel will run an executable from
+# the action sandbox reliably (avoids workspace-file exec bit problems).
+package(default_visibility = ["//visibility:public"]) 
+
+sh_binary(
+    name = "zstd_wrapper",
+    # Use a generated, executable copy of the workspace script so we do not
+    # depend on the source file's executable bit in the repo.
+    srcs = [":zstd_exec_bin_sh"],
+)
+
+zstd_toolchain(
+    name = "zstd_toolchain",
+    binary = ":zstd_wrapper",
+)
+
+# Toolchain registration target for ppc64le Linux hosts. If your host uses a
+# different platform label adjust the `exec_compatible_with` entries.
+toolchain(
+    name = "ppc64le_toolchain",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:ppc64le",
+    ],
+    toolchain = ":zstd_toolchain",
+    toolchain_type = "@bazel_lib//lib:zstd_toolchain_type",
+)
+
+genrule(
+    name = "zstd_exec_bin_sh",
+    srcs = ["zstd"],
+    outs = ["zstd_exec_bin.sh"],
+    cmd = "cp $(location zstd) $@ && chmod +x $@",
+)
